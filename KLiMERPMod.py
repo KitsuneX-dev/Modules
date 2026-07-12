@@ -115,8 +115,6 @@ class KLiMERPMod(KitsuneModule):
                 legacy_value if legacy_value is not None else default,
             )
 
-        # Старые версии могли сохранить HTML-теги и переводы строк прямо
-        # внутри действия/эмодзи. Они ломали HTML-разметку и переносы rplist.
         stored_commands = self.db.get(self.DB_NAMESPACE, "nrpcommands") or {}
         clean_commands = self._sanitize_commands(stored_commands)
         if clean_commands != stored_commands:
@@ -395,8 +393,6 @@ class KLiMERPMod(KitsuneModule):
             if emoji:
                 plain_line += f" | {emoji}"
 
-            # Каждое динамическое поле экранируется отдельно. Так старый </b>
-            # или другой пользовательский HTML не может сломать переносы Telegram.
             html_line = f"• <code>{html.escape(name)}</code> — {html.escape(action)}"
             if emoji:
                 html_line += f" | {html.escape(emoji)}"
@@ -404,8 +400,6 @@ class KLiMERPMod(KitsuneModule):
             lines_html.append(html_line)
             lines_plain.append(plain_line)
 
-        # Без blockquote: Telegram иногда некорректно копирует длинные expandable-
-        # цитаты. Обычные переводы строк сохраняют одну команду на одной строке.
         text = header + "\n\n" + "\n".join(lines_html)
 
         if len(text.encode("utf-16-le")) // 2 <= 4096:
